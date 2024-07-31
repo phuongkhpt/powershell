@@ -1,0 +1,3 @@
+﻿#(Get-ADComputer -Filter "OperatingSystem -Like '*Windows Server*' -and Enabled -eq 'True'").name | Foreach-Object {Register-DnsClient -CimSession $PSItem -Confirm:0 -Verbose}
+(Get-ADDomainController -Filter *).Name | Foreach-Object {repadmin /syncall $_ (Get-ADDomain).DistinguishedName /e /A | Out-Null}; Get-ADReplicationPartnerMetadata -Target "$env:userdnsdomain" -Scope Domain | Select-Object Server, LastReplicationSuccess
+(Get-ADDomainController -Filter *).Name | Foreach-Object{Sync-DnsServerZone -ComputerName $PSItem  -Name "$env:userdnsdomain" -PassThru -Verbose}
